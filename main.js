@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateBtn = document.getElementById('generate-btn');
     const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
+    const historyList = document.getElementById('history-list');
+    const clearHistoryBtn = document.getElementById('clear-history');
     const body = document.body;
+
+    let history = JSON.parse(localStorage.getItem('lottoHistory')) || [];
 
     // --- Theme Logic ---
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -28,9 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Lotto Generation Logic ---
+    updateHistoryUI();
+
     generateBtn.addEventListener('click', () => {
         const numbers = generateLottoNumbers();
         displayNumbers(numbers);
+        addToHistory(numbers);
+    });
+
+    clearHistoryBtn.addEventListener('click', () => {
+        history = [];
+        localStorage.setItem('lottoHistory', JSON.stringify(history));
+        updateHistoryUI();
     });
 
     function generateLottoNumbers() {
@@ -53,6 +66,45 @@ document.addEventListener('DOMContentLoaded', () => {
             ball.textContent = num;
             ball.style.animationDelay = `${index * 0.1}s`;
             lottoContainer.appendChild(ball);
+        });
+    }
+
+    function addToHistory(numbers) {
+        const timestamp = new Date().toLocaleTimeString();
+        history.unshift({ numbers, timestamp });
+        if (history.length > 10) history.pop(); // Keep last 10
+        localStorage.setItem('lottoHistory', JSON.stringify(history));
+        updateHistoryUI();
+    }
+
+    function updateHistoryUI() {
+        if (history.length === 0) {
+            historyList.innerHTML = '<p class="empty-history">아직 생성된 번호가 없습니다.</p>';
+            return;
+        }
+
+        historyList.innerHTML = '';
+        history.forEach(item => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const numbersDiv = document.createElement('div');
+            numbersDiv.className = 'history-numbers';
+            
+            item.numbers.forEach(num => {
+                const miniBall = document.createElement('div');
+                miniBall.className = `history-ball ${getRangeClass(num)}`;
+                miniBall.textContent = num;
+                numbersDiv.appendChild(miniBall);
+            });
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'history-time';
+            timeSpan.textContent = item.timestamp;
+
+            historyItem.appendChild(numbersDiv);
+            historyItem.appendChild(timeSpan);
+            historyList.appendChild(historyItem);
         });
     }
 
