@@ -267,6 +267,19 @@ h1 {
     border-color: var(--btn-primary-bg);
 }
 
+.comments-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--btn-icon-bg);
+    text-align: left;
+}
+
+.comments-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+}
+
 footer {
     margin-top: 2rem;
     font-size: 0.8rem;
